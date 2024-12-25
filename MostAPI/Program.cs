@@ -20,6 +20,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Устанавливаем порт для запуска приложения на Render
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080"; // Render задает переменную PORT
+app.Urls.Add($"http://*:{port}");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -29,7 +33,6 @@ if (app.Environment.IsDevelopment())
 
 // Включаем CORS для всех маршрутов
 app.UseCors("AllowAll");
-
 
 app.UseAuthorization();
 
