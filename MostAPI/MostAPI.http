@@ -1,0 +1,6 @@
+@MostAPI_HostAddress = http://localhost:5286
+
+GET {{MostAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
