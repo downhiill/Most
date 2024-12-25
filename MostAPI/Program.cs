@@ -3,6 +3,7 @@ using MostAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
 builder.Services.AddControllers();
 
@@ -28,7 +29,8 @@ if (!string.IsNullOrEmpty(connectionString))
 {
     connectionString = ConvertPostgresqlUrlToConnectionString(connectionString);
 }
-
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
 string ConvertPostgresqlUrlToConnectionString(string postgresqlUrl)
 {
     var uri = new Uri(postgresqlUrl);
