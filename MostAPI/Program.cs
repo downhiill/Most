@@ -22,8 +22,20 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_URL")));
+var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+if (!string.IsNullOrEmpty(connectionString))
+{
+    connectionString = ConvertPostgresqlUrlToConnectionString(connectionString);
+}
+
+string ConvertPostgresqlUrlToConnectionString(string postgresqlUrl)
+{
+    var uri = new Uri(postgresqlUrl);
+    var userInfo = uri.UserInfo.Split(':');
+
+    return $"Host={uri.Host};Port={uri.Port};Username={userInfo[0]};Password={userInfo[1]};Database={uri.AbsolutePath.TrimStart('/')}";
+}
 // ”станавливаем порт дл€ запуска приложени€ на Render
 var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
 builder.WebHost.UseUrls($"http://*:{port}");
