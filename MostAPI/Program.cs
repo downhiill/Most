@@ -17,15 +17,16 @@ builder.Services.AddCors(options =>
 // Настройка Swagger (если она уже есть)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+// Устанавливаем порт для запуска приложения на Render
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://*:{port}");
 
 var app = builder.Build();
 
-// Устанавливаем порт для запуска приложения на Render
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080"; // Render задает переменную PORT
-app.Urls.Add($"http://*:{port}");
+
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
