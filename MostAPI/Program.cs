@@ -1,7 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using MostAPI.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
 
 // Добавляем настройку CORS
 builder.Services.AddCors(options =>
@@ -17,6 +21,9 @@ builder.Services.AddCors(options =>
 // Настройка Swagger (если она уже есть)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_URL")));
 // Устанавливаем порт для запуска приложения на Render
 var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
 builder.WebHost.UseUrls($"http://*:{port}");
