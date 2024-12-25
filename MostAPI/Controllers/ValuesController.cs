@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MostAPI.Data;
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
+using MostAPI.Data;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MostAPI.Controllers
 {
@@ -12,19 +14,12 @@ namespace MostAPI.Controllers
     {
         private static readonly string TelegramBotToken = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN");
 
-        // Список Chat ID всех администраторов
-        private static readonly List<string> AdminChatIds = new List<string>
-        {
-            "935118337",  // Первый администратор
-            "821942555",  // Второй администратор
-            "592057109",  // Третий администратор
-            "448145168"   // Четвертый администратор
-        };
-
         private readonly TelegramBotClient _botClient;
+        private readonly ApplicationDbContext _context;
 
-        public ValuesController()
+        public ValuesController(ApplicationDbContext context)
         {
+            _context = context;
             _botClient = new TelegramBotClient(TelegramBotToken);
         }
 
@@ -41,8 +36,13 @@ namespace MostAPI.Controllers
 
             try
             {
+                // Получаем список администраторов из базы данных
+                var adminChatIds = await _context.Admins
+                    .Select(a => a.ChatId)
+                    .ToListAsync();
+
                 // Отправляем сообщение всем администраторам
-                foreach (var chatId in AdminChatIds)
+                foreach (var chatId in adminChatIds)
                 {
                     await _botClient.SendTextMessageAsync(
                         chatId: chatId,
