@@ -30,7 +30,7 @@ if (app.Environment.IsDevelopment())
 // Включаем CORS для всех маршрутов
 app.UseCors("AllowAll");
 
-app.UseHttpsRedirection();
+
 app.UseAuthorization();
 
 app.MapControllers();
