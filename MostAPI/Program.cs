@@ -36,7 +36,7 @@ string ConvertPostgresqlUrlToConnectionString(string postgresqlUrl)
     var uri = new Uri(postgresqlUrl);
     var userInfo = uri.UserInfo.Split(':');
 
-    return $"Host={uri.Host};Port={uri.Port};Username={userInfo[0]};Password={userInfo[1]};Database={uri.AbsolutePath.TrimStart('/')}";
+    return $"Host={uri.Host};Port=5432;Username={userInfo[0]};Password={userInfo[1]};Database={uri.AbsolutePath.TrimStart('/')}";
 }
 // ”станавливаем порт дл€ запуска приложени€ на Render
 var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
