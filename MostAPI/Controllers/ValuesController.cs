@@ -10,7 +10,7 @@ namespace MostAPI.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        private const string TelegramBotToken = "7914749164:AAF6_y-cmoFl87eLEUa4JAunuGHmyENCgYs";
+        private static readonly string TelegramBotToken = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN");
 
         // Список Chat ID всех администраторов
         private static readonly List<string> AdminChatIds = new List<string>
