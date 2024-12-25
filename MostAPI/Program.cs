@@ -1,18 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using MostAPI;
-using MostAPI.Data;
-using System;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-string databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL") ?? throw new InvalidOperationException("DATABASE_URL not set");
-builder.Configuration["ConnectionStrings:DefaultConnection"] = DatabaseHelper.ConvertPostgresUrlToConnectionString(databaseUrl);
 
-// Добавляем сервисы
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Добавляем настройку CORS
 builder.Services.AddCors(options =>
 {
