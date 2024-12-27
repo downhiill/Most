@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MostAPI.Data;
 using System.Collections.Generic;
 
-namespace MostAPI.Data
+namespace MostAPI.Context
 {
-    public class ApplicationDbContext : DbContext
+    public class PostgresDbContext : DbContext
     {
         public DbSet<Admin> admins { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -12,7 +13,8 @@ namespace MostAPI.Data
             modelBuilder.Entity<Admin>().Property(a => a.ChatId).HasColumnName("chatid");
         }
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+
+        public PostgresDbContext(DbContextOptions<PostgresDbContext> options)
             : base(options)
         {
         }

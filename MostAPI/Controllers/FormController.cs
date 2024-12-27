@@ -5,6 +5,7 @@ using Telegram.Bot.Types.Enums;
 using MostAPI.Data;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MostAPI.Context;
 
 namespace MostAPI.Controllers
 {
@@ -15,9 +16,9 @@ namespace MostAPI.Controllers
         private static readonly string TelegramBotToken = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN");
 
         private readonly TelegramBotClient _botClient;
-        private readonly ApplicationDbContext _context;
+        private readonly PostgresDbContext _context;
 
-        public FormController(ApplicationDbContext context)
+        public FormController(PostgresDbContext context)
         {
             _context = context;
             _botClient = new TelegramBotClient(TelegramBotToken);

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using MostAPI.Data;
+using MongoDB.Driver;
+using MostAPI.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,29 +9,33 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 
-// Добавляем настройку CORS
+// Adding a CORS setting
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()    // Разрешаем доступ с любого источника
-              .AllowAnyMethod()    // Разрешаем любые методы HTTP (GET, POST и т.д.)
-              .AllowAnyHeader();   // Разрешаем любые заголовки
+        policy.AllowAnyOrigin()    // Allow access from any source
+              .AllowAnyMethod()    // Allow any HTTP methods (GET, POST, etc.)
+              .AllowAnyHeader();   // Allow any headers
     });
 });
 
-// Настройка Swagger (если она уже есть)
+// Swagger setup (if you already have one)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// PostgreSQL
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
 
 if (!string.IsNullOrEmpty(connectionString))
 {
     connectionString = ConvertPostgresqlUrlToConnectionString(connectionString);
 }
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+
+builder.Services.AddDbContext<PostgresDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+//Convertation To ConnectionString URL
 string ConvertPostgresqlUrlToConnectionString(string postgresqlUrl)
 {
     var uri = new Uri(postgresqlUrl);
@@ -38,13 +43,23 @@ string ConvertPostgresqlUrlToConnectionString(string postgresqlUrl)
 
     return $"Host={uri.Host};Port=5432;Username={userInfo[0]};Password={userInfo[1]};Database={uri.AbsolutePath.TrimStart('/')}";
 }
-// Устанавливаем порт для запуска приложения на Render
+// Install PORT for launch app on the Render
 var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
 builder.WebHost.UseUrls($"http://*:{port}");
 
+// MongoDB
+
+// Getting the connection string for MongoDB
+var mongoConnectionString = Environment.GetEnvironmentVariable("MONGODB_URL");
+
+if (!string.IsNullOrEmpty(mongoConnectionString))
+{
+    // Add a MongoDB client to a DI container
+    builder.Services.AddSingleton<IMongoClient>(new MongoClient(mongoConnectionString));
+}
+builder.Services.AddSingleton<MongoDbContext>();
+
 var app = builder.Build();
-
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
@@ -53,7 +68,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
-// Включаем CORS для всех маршрутов
+// Enable CORS for all routes
 app.UseCors("AllowAll");
 
 app.UseAuthorization();

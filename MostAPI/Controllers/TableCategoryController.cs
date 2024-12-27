@@ -1,44 +1,53 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
+using MostAPI.Context;
 using MostAPI.Data;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MostAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TableCategoryController : Controller
+    public class TableCategoryController : ControllerBase
     {
-        private readonly ApplicationDbContext _context; 
+        private readonly MongoDbContext _mongoContext;
 
-        public TableCategoryController(ApplicationDbContext context) { _context = context; } 
-        
-        // GET api/shoes
-        [HttpGet] 
-        public async Task<ActionResult<IEnumerable<Shoes>>> GetShoes() 
-        { 
-            return await _context.Shoes.ToListAsync(); 
+        public TableCategoryController(MongoDbContext mongoContext)
+        {
+            _mongoContext = mongoContext;
         }
 
-        // GET api/bag
-        [HttpGet]
+        // GET: api/tablecategory/shoes
+        [HttpGet("shoes")]
+        public async Task<ActionResult<IEnumerable<Shoes>>> GetShoes()
+        {
+            var shoes = await _mongoContext.Shoes.Find(_ => true).ToListAsync();
+            return Ok(shoes);
+        }
+
+        // GET: api/tablecategory/bag
+        [HttpGet("bag")]
         public async Task<ActionResult<IEnumerable<Bag>>> GetBag()
         {
-            return await _context.Bag.ToListAsync();
+            var bags = await _mongoContext.Bags.Find(_ => true).ToListAsync();
+            return Ok(bags);
         }
 
-        // GET api/drycleaning
-        [HttpGet]
+        // GET: api/tablecategory/drycleaning
+        [HttpGet("drycleaning")]
         public async Task<ActionResult<IEnumerable<DryCleaning>>> GetDryCleaning()
         {
-            return await _context.DryCleaning.ToListAsync();
+            var dryCleanings = await _mongoContext.DryCleanings.Find(_ => true).ToListAsync();
+            return Ok(dryCleanings);
         }
 
-        // GET api/drycleaning
-        [HttpGet]
+        // GET: api/tablecategory/delivery
+        [HttpGet("delivery")]
         public async Task<ActionResult<IEnumerable<Delivery>>> GetDelivery()
         {
-            return await _context.Delivery.ToListAsync();
+            var deliveries = await _mongoContext.Deliveries.Find(_ => true).ToListAsync();
+            return Ok(deliveries);
         }
-
-
     }
 }
