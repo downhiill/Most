@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace MostAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/form")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class FormController : ControllerBase
     {
         private static readonly string TelegramBotToken = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN");
 
         private readonly TelegramBotClient _botClient;
         private readonly ApplicationDbContext _context;
 
-        public ValuesController(ApplicationDbContext context)
+        public FormController(ApplicationDbContext context)
         {
             _context = context;
             _botClient = new TelegramBotClient(TelegramBotToken);
@@ -58,5 +58,7 @@ namespace MostAPI.Controllers
                 return StatusCode(500, $"Error sending message: {ex.Message}");
             }
         }
+
+
     }
 }
