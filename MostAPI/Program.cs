@@ -47,17 +47,6 @@ string ConvertPostgresqlUrlToConnectionString(string postgresqlUrl)
 var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
 builder.WebHost.UseUrls($"http://*:{port}");
 
-// MongoDB
-
-// Getting the connection string for MongoDB
-var mongoConnectionString = Environment.GetEnvironmentVariable("MONGODB_URL");
-
-if (!string.IsNullOrEmpty(mongoConnectionString))
-{
-    // Add a MongoDB client to a DI container
-    builder.Services.AddSingleton<IMongoClient>(new MongoClient(mongoConnectionString));
-}
-builder.Services.AddSingleton<MongoDbContext>();
 
 var app = builder.Build();
 
