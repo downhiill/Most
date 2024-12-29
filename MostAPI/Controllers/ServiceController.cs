@@ -32,7 +32,7 @@ namespace MostAPI.Controllers
 
         // Фильтрация услуг по имени
         [HttpGet("{categoryId}/services")]
-        public async Task<ActionResult<List<Services>>> FilterServices(string categoryId, [FromQuery] string nameFilter)
+        public async Task<ActionResult<List<Services>>> FilterServices(string categoryId, [FromQuery] string nameFilter = null)
         {
             var services = await _mongoDBService.FilterServicesAsync(categoryId, nameFilter);
             return Ok(services);
