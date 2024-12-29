@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using MostAPI.Context;
+using MostAPI.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +43,7 @@ if (!string.IsNullOrEmpty(mongoConnectionString))
 {
     builder.Services.AddSingleton<IMongoClient, MongoClient>(sp => new MongoClient(mongoConnectionString));
 }
+builder.Services.AddScoped<MongoDBService>();
 
 //Convertation To ConnectionString URL
 string ConvertPostgresqlUrlToConnectionString(string postgresqlUrl)
