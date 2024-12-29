@@ -35,6 +35,14 @@ if (!string.IsNullOrEmpty(connectionString))
 builder.Services.AddDbContext<PostgresDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+// MongoDB setup
+var mongoConnectionString = Environment.GetEnvironmentVariable("MONGODB_URL");
+
+if (!string.IsNullOrEmpty(mongoConnectionString))
+{
+    builder.Services.AddSingleton<IMongoClient, MongoClient>(sp => new MongoClient(mongoConnectionString));
+}
+
 //Convertation To ConnectionString URL
 string ConvertPostgresqlUrlToConnectionString(string postgresqlUrl)
 {
