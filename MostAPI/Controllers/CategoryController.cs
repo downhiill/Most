@@ -27,9 +27,24 @@ namespace MostAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateCategory([FromBody] Category category)
         {
-            await _mongoDBService.CreateCategoryAsync(category);
-            return CreatedAtAction(nameof(GetCategories), new { id = category.Id }, category);
+            try
+            {
+                if (category == null)
+                {
+                    return BadRequest("Invalid data.");
+                }
+
+                await _mongoDBService.CreateCategoryAsync(category);
+                return CreatedAtAction(nameof(GetCategories), new { id = category.Id }, category);
+            }
+            catch (Exception ex)
+            {
+                // Логирование ошибки
+                Console.Error.WriteLine($"Error creating category: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
+
 
         // Обновить категорию
         [HttpPut("{id}")]
