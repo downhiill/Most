@@ -25,8 +25,20 @@ namespace MostAPI.Service
         }
 
         // Получить все категории
-        public async Task<List<Category>> GetCategoriesAsync() =>
-            await _categories.Find(category => true).ToListAsync();
+        public async Task<List<Category>> GetCategoriesAsync()
+        {
+            // Получаем только id и name категорий, без данных об услугах
+            var categories = await _categories
+                .Find(category => true)
+                .Project(category => new Category
+                {
+                    Id = category.Id,
+                    Name = category.Name
+                })
+                .ToListAsync();
+
+            return categories;
+        }
 
         // Добавить новую категорию
         public async Task CreateCategoryAsync(Category category) =>
@@ -74,10 +86,26 @@ namespace MostAPI.Service
         }
 
         // Фильтрация услуг по имени
-        public async Task<List<Services>> FilterServicesAsync(string categoryId, string nameFilter)
+        public async Task<List<Services>> FilterServicesAsync(string categoryId, string nameFilter = null)
         {
             var category = await _categories.Find(c => c.Id == categoryId).FirstOrDefaultAsync();
-            return category?.Services.Where(s => s.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            // Если категория не найдена, возвращаем null или пустой список
+            if (category == null)
+            {
+                return new List<Services>();
+            }
+
+            // Если nameFilter не указан, возвращаем все услуги
+            if (string.IsNullOrEmpty(nameFilter))
+            {
+                return category.Services;
+            }
+
+            // Если nameFilter задан, фильтруем услуги по имени
+            return category.Services
+                .Where(s => s.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase))
+                .ToList();
         }
     }
 }

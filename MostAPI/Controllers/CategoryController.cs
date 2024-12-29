@@ -19,9 +19,18 @@ namespace MostAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Category>>> GetCategories()
         {
-            var categories = await _mongoDBService.GetCategoriesAsync();
-            return Ok(categories);
+            try
+            {
+                var categories = await _mongoDBService.GetCategoriesAsync();
+                return Ok(categories);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error fetching categories: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
+
 
         // Добавить новую категорию
         [HttpPost]
