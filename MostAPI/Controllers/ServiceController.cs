@@ -8,17 +8,17 @@ namespace MostAPI.Controllers
     [ApiController]
     public class ServiceController : Controller
     {
-        private readonly MongoDBService _mongoDBService;
+        private readonly ServicesService _servicesService;
 
-        public ServiceController(MongoDBService mongoDBService)
+        public ServiceController(ServicesService servicesService)
         {
-            _mongoDBService = mongoDBService;
+            _servicesService = servicesService;
         }
         // Добавить услугу в категорию
         [HttpPost("{categoryId}/services")]
         public async Task<ActionResult> AddService(string categoryId, [FromBody] Services service)
         {
-            await _mongoDBService.AddServiceAsync(categoryId, service);
+            await _servicesService.AddServiceAsync(categoryId, service);
             return CreatedAtAction(nameof(AddService), new { categoryId = categoryId, serviceId = service.Id }, service);
         }
 
@@ -26,7 +26,7 @@ namespace MostAPI.Controllers
         [HttpDelete("{categoryId}/services/{serviceId}")]
         public async Task<ActionResult> DeleteService(string categoryId, string serviceId)
         {
-            await _mongoDBService.DeleteServiceAsync(categoryId, serviceId);
+            await _servicesService.DeleteServiceAsync(categoryId, serviceId);
             return NoContent();
         }
 
@@ -34,7 +34,7 @@ namespace MostAPI.Controllers
         [HttpGet("{categoryId}/services")]
         public async Task<ActionResult<List<Services>>> FilterServices(string categoryId, [FromQuery] string nameFilter = null)
         {
-            var services = await _mongoDBService.FilterServicesAsync(categoryId, nameFilter);
+            var services = await _servicesService.FilterServicesAsync(categoryId, nameFilter);
             return Ok(services);
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MostAPI.Data;
+using MostAPI.IService;
 using MostAPI.Service;
 
 namespace MostAPI.Controllers
@@ -8,11 +9,11 @@ namespace MostAPI.Controllers
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly MongoDBService _mongoDBService;
+        private readonly CategoryService _categoryService;
 
-        public CategoryController(MongoDBService mongoDBService)
+        public CategoryController(CategoryService categoryService)
         {
-            _mongoDBService = mongoDBService;
+            _categoryService = categoryService;
         }
 
         // Получить все категории
@@ -21,7 +22,7 @@ namespace MostAPI.Controllers
         {
             try
             {
-                var categories = await _mongoDBService.GetCategoriesAsync();
+                var categories = await _categoryService.GetCategoriesAsync();
                 return Ok(categories);
             }
             catch (Exception ex)
@@ -43,7 +44,7 @@ namespace MostAPI.Controllers
                     return BadRequest("Invalid data.");
                 }
 
-                await _mongoDBService.CreateCategoryAsync(category);
+                await _categoryService.CreateCategoryAsync(category);
                 return CreatedAtAction(nameof(GetCategories), new { id = category.Id }, category);
             }
             catch (Exception ex)
@@ -59,7 +60,7 @@ namespace MostAPI.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateCategory(string id, [FromBody] Category category)
         {
-            await _mongoDBService.UpdateCategoryAsync(id, category);
+            await _categoryService.UpdateCategoryAsync(id, category);
             return NoContent();
         }
 
@@ -67,7 +68,7 @@ namespace MostAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCategory(string id)
         {
-            await _mongoDBService.DeleteCategoryAsync(id);
+            await _categoryService.DeleteCategoryAsync(id);
             return NoContent();
         }
     }
