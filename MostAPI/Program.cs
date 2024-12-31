@@ -48,6 +48,7 @@ if (!string.IsNullOrEmpty(mongoConnectionString))
 builder.Services.AddScoped<MongoDBService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ServicesService>();
+builder.Services.AddScoped<FaqService>();
 
 //Convertation To ConnectionString URL
 string ConvertPostgresqlUrlToConnectionString(string postgresqlUrl)
