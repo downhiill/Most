@@ -1,10 +1,11 @@
-﻿using MongoDB.Driver;
+﻿using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 using MostAPI.Data;
 using MostAPI.Service;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-public class FaqService 
+public class FaqService
 {
     private readonly IMongoCollection<Faq> _faqs;
 
@@ -13,16 +14,29 @@ public class FaqService
         _faqs = faqs;
     }
 
+    // Получить все записи (без пагинации, как раньше)
     public async Task<List<Faq>> GetAllAsync() =>
         await _faqs.Find(f => true).ToListAsync();
+
+    // Получить случайные записи для конкретной страницы
+    public async Task<List<Faq>> GetPageAsync(int pageNumber, int pageSize = 4)
+    {
+        // Всего случайных записей
+        var totalFaqs = await _faqs.AsQueryable()
+                                   .OrderBy(_ => Guid.NewGuid()) // Случайная сортировка
+                                   .ToListAsync();
+
+        // Пагинация: берём нужную страницу
+        return totalFaqs.Skip((pageNumber - 1) * pageSize)
+                        .Take(pageSize)
+                        .ToList();
+    }
 
     public async Task<Faq> GetByIdAsync(string id) =>
         await _faqs.Find(f => f.Id == id).FirstOrDefaultAsync();
 
-
-    public async Task CreateAsync(Faq faq) => 
+    public async Task CreateAsync(Faq faq) =>
         await _faqs.InsertOneAsync(faq);
-
 
     public async Task UpdateAsync(string id, Faq faq) =>
         await _faqs.ReplaceOneAsync(f => f.Id == id, faq);

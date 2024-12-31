@@ -18,10 +18,18 @@ namespace MostAPI.Controllers
         }
 
         // Получить все вопросы и ответы
-        [HttpGet]
+        [HttpGet("all")]
         public async Task<ActionResult<List<Faq>>> GetAll()
         {
             var faqs = await _faqService.GetAllAsync();
+            return Ok(faqs);
+        }
+
+        // Получить вопросы и ответы с пагинацией (случайные данные)
+        [HttpGet("page")]
+        public async Task<ActionResult<List<Faq>>> GetPage([FromQuery] int page = 1, [FromQuery] int pageSize = 4)
+        {
+            var faqs = await _faqService.GetPageAsync(page, pageSize);
             return Ok(faqs);
         }
 
