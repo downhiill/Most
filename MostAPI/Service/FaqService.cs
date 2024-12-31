@@ -22,11 +22,11 @@ public class FaqService
     // Получить 5 случайных записей
     public async Task<List<Faq>> GetRandomAsync(int count = 5)
     {
-        return await _faqs.AsQueryable()
-                          .OrderBy(_ => Guid.NewGuid()) // Случайная сортировка
-                          .Take(count)
-                          .ToListAsync();
+        var faqs = await _faqs.Find(f => true).ToListAsync(); // Получаем все записи
+        var randomFaqs = faqs.OrderBy(_ => Guid.NewGuid()).Take(count).ToList(); // Перемешиваем и выбираем случайные
+        return randomFaqs;
     }
+
 
     // Получить запись по ID
     public async Task<Faq> GetByIdAsync(int id)
