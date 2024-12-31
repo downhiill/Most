@@ -34,7 +34,7 @@ namespace MostAPI.Controllers
 
         // Получить вопрос по ID
         [HttpGet("{id}")]
-        public async Task<ActionResult<Faq>> GetById(string id)
+        public async Task<ActionResult<Faq>> GetById(int id)
         {
             var faq = await _faqService.GetByIdAsync(id);
             if (faq == null)
@@ -54,26 +54,28 @@ namespace MostAPI.Controllers
 
         // Обновить существующий вопрос
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(string id, [FromBody] Faq faq)
+        public async Task<ActionResult> Update(int id, [FromBody] Faq faq)
         {
             var existingFaq = await _faqService.GetByIdAsync(id);
             if (existingFaq == null)
             {
                 return NotFound();
             }
+
             await _faqService.UpdateAsync(id, faq);
             return NoContent();
         }
 
         // Удалить вопрос
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(string id)
+        public async Task<ActionResult> Delete(int id)
         {
             var faq = await _faqService.GetByIdAsync(id);
             if (faq == null)
             {
                 return NotFound();
             }
+
             await _faqService.DeleteAsync(id);
             return NoContent();
         }

@@ -1,10 +1,9 @@
 ﻿using MongoDB.Driver;
-using MongoDB.Bson;
+using MongoDB.Driver.Linq;
 using MostAPI.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 public class FaqService
 {
@@ -15,7 +14,7 @@ public class FaqService
         _faqs = faqs;
     }
 
-    // Получить все записи (без пагинации, как раньше)
+    // Получить все записи (без пагинации)
     public async Task<List<Faq>> GetAllAsync() =>
         await _faqs.Find(f => true).ToListAsync();
 
@@ -29,11 +28,9 @@ public class FaqService
     }
 
     // Получить запись по ID
-    public async Task<Faq> GetByIdAsync(string id)
+    public async Task<Faq> GetByIdAsync(int id)
     {
-        // Преобразуем строковый ID в ObjectId
-        var objectId = ObjectId.Parse(id);
-        return await _faqs.Find(f => f.Id == objectId).FirstOrDefaultAsync();
+        return await _faqs.Find(f => f.Id == id).FirstOrDefaultAsync();
     }
 
     // Создать новую запись
@@ -41,16 +38,14 @@ public class FaqService
         await _faqs.InsertOneAsync(faq);
 
     // Обновить запись
-    public async Task UpdateAsync(string id, Faq faq)
+    public async Task UpdateAsync(int id, Faq faq)
     {
-        var objectId = ObjectId.Parse(id);
-        await _faqs.ReplaceOneAsync(f => f.Id == objectId, faq);
+        await _faqs.ReplaceOneAsync(f => f.Id == id, faq);
     }
 
     // Удалить запись
-    public async Task DeleteAsync(string id)
+    public async Task DeleteAsync(int id)
     {
-        var objectId = ObjectId.Parse(id);
-        await _faqs.DeleteOneAsync(f => f.Id == objectId);
+        await _faqs.DeleteOneAsync(f => f.Id == id);
     }
 }
