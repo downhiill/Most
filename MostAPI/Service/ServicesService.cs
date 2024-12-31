@@ -8,9 +8,9 @@ namespace MostAPI.Service
     {
         private readonly IMongoCollection<Category> _categories;
 
-        public ServicesService(IMongoCollection<Category> categories)
+        public ServicesService(MongoDBService mongoDBService)
         {
-            _categories = categories;
+            _categories = mongoDBService.Categories;
         }
 
         public async Task<Services> GetServiceByIdAsync(string categoryId, string serviceId) =>

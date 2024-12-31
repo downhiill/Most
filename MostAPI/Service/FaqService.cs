@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using MostAPI.Data;
+using MostAPI.Service;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,9 +10,9 @@ public class FaqService
 {
     private readonly IMongoCollection<Faq> _faqs;
 
-    public FaqService(IMongoCollection<Faq> faqs)
+    public FaqService(MongoDBService mongoDBService)
     {
-        _faqs = faqs;
+        _faqs = mongoDBService.Faqs;
     }
 
     // Получить все записи (без пагинации)
