@@ -18,18 +18,13 @@ public class FaqService
     public async Task<List<Faq>> GetAllAsync() =>
         await _faqs.Find(f => true).ToListAsync();
 
-    // Получить случайные записи для конкретной страницы
-    public async Task<List<Faq>> GetPageAsync(int pageNumber, int pageSize = 4)
+    // Получить 5 случайных записей
+    public async Task<List<Faq>> GetRandomAsync(int count = 5)
     {
-        // Всего случайных записей
-        var totalFaqs = await _faqs.AsQueryable()
-                                   .OrderBy(_ => Guid.NewGuid()) // Случайная сортировка
-                                   .ToListAsync();
-
-        // Пагинация: берём нужную страницу
-        return totalFaqs.Skip((pageNumber - 1) * pageSize)
-                        .Take(pageSize)
-                        .ToList();
+        return await _faqs.AsQueryable()
+                          .OrderBy(_ => Guid.NewGuid()) // Случайная сортировка
+                          .Take(count)
+                          .ToListAsync();
     }
 
     public async Task<Faq> GetByIdAsync(string id) =>

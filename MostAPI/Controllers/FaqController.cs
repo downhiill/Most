@@ -25,11 +25,10 @@ namespace MostAPI.Controllers
             return Ok(faqs);
         }
 
-        // Получить вопросы и ответы с пагинацией (случайные данные)
-        [HttpGet("page")]
-        public async Task<ActionResult<List<Faq>>> GetPage([FromQuery] int page = 1, [FromQuery] int pageSize = 4)
+        [HttpGet("random")]
+        public async Task<ActionResult<List<Faq>>> GetRandom()
         {
-            var faqs = await _faqService.GetPageAsync(page, pageSize);
+            var faqs = await _faqService.GetRandomAsync();
             return Ok(faqs);
         }
 
