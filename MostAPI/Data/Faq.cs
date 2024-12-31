@@ -5,7 +5,8 @@ namespace MostAPI.Data
 {
     public class Faq
     {
-        public int Id { get; set; } // ID записи
+        [BsonId] // Указывает, что это уникальный идентификатор
+        public ObjectId Id { get; set; } // ID записи, MongoDB будет автоматически генерировать этот ID
         public string Question { get; set; } // Вопрос
         public string Answer { get; set; } // Ответ
     }
