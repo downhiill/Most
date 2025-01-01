@@ -56,13 +56,36 @@ namespace MostAPI.Controllers
         }
 
 
-        // Обновить категорию
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateCategory(string id, [FromBody] Category category)
         {
-            await _categoryService.UpdateCategoryAsync(id, category);
-            return NoContent();
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return BadRequest("Id cannot be null or empty.");
+                }
+
+                if (category == null)
+                {
+                    return BadRequest("Invalid data.");
+                }
+
+                await _categoryService.UpdateCategoryAsync(id, category);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                Console.Error.WriteLine($"Error updating category: {ex.Message}");
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error updating category: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
+
 
         // Удалить категорию
         [HttpDelete("{id}")]
