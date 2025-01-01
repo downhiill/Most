@@ -16,7 +16,7 @@ namespace MostAPI.Controllers
         }
         // Добавить услугу в категорию
         [HttpPost("{categoryId}/services")]
-        public async Task<ActionResult> AddService(string categoryId, [FromBody] Services service)
+        public async Task<ActionResult> AddService(int categoryId, [FromBody] Services service)
         {
             await _servicesService.AddServiceAsync(categoryId, service);
             return CreatedAtAction(nameof(AddService), new { categoryId = categoryId, serviceId = service.Id }, service);
@@ -24,7 +24,7 @@ namespace MostAPI.Controllers
 
         // Удалить услугу из категории
         [HttpDelete("{categoryId}/services/{serviceId}")]
-        public async Task<ActionResult> DeleteService(string categoryId, string serviceId)
+        public async Task<ActionResult> DeleteService(int categoryId, int serviceId)
         {
             await _servicesService.DeleteServiceAsync(categoryId, serviceId);
             return NoContent();
@@ -32,7 +32,7 @@ namespace MostAPI.Controllers
 
         // Фильтрация услуг по имени
         [HttpGet("{categoryId}/services")]
-        public async Task<ActionResult<List<Services>>> FilterServices(string categoryId, [FromQuery] string nameFilter = null)
+        public async Task<ActionResult<List<Services>>> FilterServices(int categoryId, [FromQuery] string nameFilter = null)
         {
             var services = await _servicesService.FilterServicesAsync(categoryId, nameFilter);
             return Ok(services);

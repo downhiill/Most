@@ -57,14 +57,10 @@ namespace MostAPI.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateCategory(string id, [FromBody] Category category)
+        public async Task<ActionResult> UpdateCategory(int id, [FromBody] Category category)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(id))
-                {
-                    return BadRequest("Id cannot be null or empty.");
-                }
 
                 if (category == null)
                 {
@@ -89,7 +85,7 @@ namespace MostAPI.Controllers
 
         // Удалить категорию
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteCategory(string id)
+        public async Task<ActionResult> DeleteCategory(int id)
         {
             await _categoryService.DeleteCategoryAsync(id);
             return NoContent();
