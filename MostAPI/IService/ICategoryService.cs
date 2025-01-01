@@ -6,7 +6,7 @@ namespace MostAPI.IService
     {
         Task<List<Category>> GetCategoriesAsync();
         Task CreateCategoryAsync(Category category);
-        Task UpdateCategoryAsync(string id, Category category);
-        Task DeleteCategoryAsync(string id);
+        Task UpdateCategoryAsync(int id, Category category);
+        Task DeleteCategoryAsync(int id);
     }
 }

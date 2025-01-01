@@ -13,13 +13,13 @@ namespace MostAPI.Service
             _categories = mongoDBService.Categories;
         }
 
-        public async Task<Services> GetServiceByIdAsync(string categoryId, string serviceId) =>
+        public async Task<Services> GetServiceByIdAsync(int categoryId, int serviceId) =>
             await _categories
                 .Find(c => c.Id == categoryId)
                 .Project(c => c.Services.FirstOrDefault(s => s.Id == serviceId))
                 .FirstOrDefaultAsync();
 
-        public async Task AddServiceAsync(string categoryId, Services service)
+        public async Task AddServiceAsync(int categoryId, Services service)
         {
             var category = await _categories.Find(c => c.Id == categoryId).FirstOrDefaultAsync();
             if (category != null)
@@ -29,7 +29,7 @@ namespace MostAPI.Service
             }
         }
 
-        public async Task DeleteServiceAsync(string categoryId, string serviceId)
+        public async Task DeleteServiceAsync(int categoryId, int serviceId)
         {
             var category = await _categories.Find(c => c.Id == categoryId).FirstOrDefaultAsync();
             if (category != null)
@@ -43,7 +43,7 @@ namespace MostAPI.Service
             }
         }
 
-        public async Task<List<Services>> FilterServicesAsync(string categoryId, string nameFilter = null)
+        public async Task<List<Services>> FilterServicesAsync(int categoryId, string nameFilter = null)
         {
             var category = await _categories.Find(c => c.Id == categoryId).FirstOrDefaultAsync();
 

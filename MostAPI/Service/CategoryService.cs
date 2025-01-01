@@ -28,9 +28,9 @@ namespace MostAPI.Service
         public async Task CreateCategoryAsync(Category category) =>
             await _categories.InsertOneAsync(category);
 
-        public async Task UpdateCategoryAsync(string id, Category category)
+        public async Task UpdateCategoryAsync(int id, Category category)
         {
-            if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("Id cannot be null or whitespace.", nameof(id));
+            
             if (category == null) throw new ArgumentNullException(nameof(category));
 
             var updateDefinitions = new List<UpdateDefinition<Category>>();
@@ -61,7 +61,7 @@ namespace MostAPI.Service
         }
 
 
-        public async Task DeleteCategoryAsync(string id) =>
+        public async Task DeleteCategoryAsync(int id) =>
             await _categories.DeleteOneAsync(c => c.Id == id);
     }
 }
