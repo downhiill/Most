@@ -1,12 +1,13 @@
 ﻿using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using MostAPI.Data;
+using MostAPI.IService;
 using MostAPI.Service;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-public class FaqService
+public class FaqService : IFaqService
 {
     private readonly IMongoCollection<Faq> _faqs;
 
