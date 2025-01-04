@@ -19,6 +19,7 @@ namespace MostAPI.Controllers
 
         // Создание отзыва
         [HttpPost]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> CreateReview([FromForm] Review review, IFormFile photo)
         {
             if (photo != null)
