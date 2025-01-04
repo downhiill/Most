@@ -20,13 +20,20 @@ namespace MostAPI.Controllers
         // Создание отзыва
         [HttpPost]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CreateReview([FromForm] Review review, IFormFile uploadedPhoto)
+        public async Task<IActionResult> CreateReview([FromForm] ReviewRequest request)
         {
-            if (uploadedPhoto != null)
+            var review = new Review
+            {
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Username = request.Username
+            };
+
+            if (request.UploadedPhoto != null)
             {
                 using (var memoryStream = new MemoryStream())
                 {
-                    await uploadedPhoto.CopyToAsync(memoryStream);
+                    await request.UploadedPhoto.CopyToAsync(memoryStream);
                     review.Photo = memoryStream.ToArray();
                 }
             }
@@ -39,7 +46,7 @@ namespace MostAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Review>> GetReview(string id)
         {
-            var review = await _reviews.Find(r => r.Id == new ObjectId(id)).FirstOrDefaultAsync();
+            var review = await _reviews.Find(r => r.Id == id).FirstOrDefaultAsync();
             if (review == null)
                 return NotFound();
             return Ok(review);
@@ -47,20 +54,27 @@ namespace MostAPI.Controllers
 
         // Обновление отзыва
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateReview(string id, [FromForm] Review review, IFormFile uploadedPhoto)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateReview(string id, [FromForm] ReviewRequest request)
         {
-            if (uploadedPhoto != null)
+            var review = await _reviews.Find(r => r.Id == id).FirstOrDefaultAsync();
+            if (review == null)
+                return NotFound();
+
+            review.FirstName = request.FirstName;
+            review.LastName = request.LastName;
+            review.Username = request.Username;
+
+            if (request.UploadedPhoto != null)
             {
                 using (var memoryStream = new MemoryStream())
                 {
-                    await uploadedPhoto.CopyToAsync(memoryStream);
+                    await request.UploadedPhoto.CopyToAsync(memoryStream);
                     review.Photo = memoryStream.ToArray();
                 }
             }
 
-            var result = await _reviews.ReplaceOneAsync(r => r.Id == new ObjectId(id), review);
-            if (result.MatchedCount == 0)
-                return NotFound();
+            var result = await _reviews.ReplaceOneAsync(r => r.Id == id, review);
             return NoContent();
         }
 
@@ -68,11 +82,10 @@ namespace MostAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReview(string id)
         {
-            var result = await _reviews.DeleteOneAsync(r => r.Id == new ObjectId(id));
+            var result = await _reviews.DeleteOneAsync(r => r.Id == id);
             if (result.DeletedCount == 0)
                 return NotFound();
             return NoContent();
         }
     }
-
 }
