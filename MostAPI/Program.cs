@@ -25,17 +25,7 @@ builder.Services.AddCors(options =>
 
 // Swagger setup (if you already have one)
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    // Добавляем фильтр для работы с IFormFile
-    options.OperationFilter<Swashbuckle.AspNetCore.Filters.FileUploadOperationFilter>();
-
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "API Documentation",
-        Version = "v1"
-    });
-});
+builder.Services.AddSwaggerGen();
 
 // PostgreSQL
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
@@ -79,11 +69,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
-        options.RoutePrefix = string.Empty; // Swagger будет доступен по корневому адресу
-    });
+    app.UseSwaggerUI();
 }
 
 // Enable CORS for all routes
