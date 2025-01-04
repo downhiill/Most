@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 using MostAPI.Context;
 using MostAPI.Data;
@@ -25,7 +26,13 @@ builder.Services.AddCors(options =>
 
 // Swagger setup (if you already have one)
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+
+    // Поддержка загрузки файлов
+    c.MapType<IFormFile>(() => new OpenApiSchema { Type = "string", Format = "binary" });
+});
 
 // PostgreSQL
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
