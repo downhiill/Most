@@ -20,13 +20,13 @@ namespace MostAPI.Controllers
         // Создание отзыва
         [HttpPost]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CreateReview([FromForm] Review review, IFormFile photo)
+        public async Task<IActionResult> CreateReview([FromForm] Review review, IFormFile uploadedPhoto)
         {
-            if (photo != null)
+            if (uploadedPhoto != null)
             {
                 using (var memoryStream = new MemoryStream())
                 {
-                    await photo.CopyToAsync(memoryStream);
+                    await uploadedPhoto.CopyToAsync(memoryStream);
                     review.Photo = memoryStream.ToArray();
                 }
             }
@@ -47,13 +47,13 @@ namespace MostAPI.Controllers
 
         // Обновление отзыва
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateReview(string id, [FromForm] Review review, IFormFile photo)
+        public async Task<IActionResult> UpdateReview(string id, [FromForm] Review review, IFormFile uploadedPhoto)
         {
-            if (photo != null)
+            if (uploadedPhoto != null)
             {
                 using (var memoryStream = new MemoryStream())
                 {
-                    await photo.CopyToAsync(memoryStream);
+                    await uploadedPhoto.CopyToAsync(memoryStream);
                     review.Photo = memoryStream.ToArray();
                 }
             }
