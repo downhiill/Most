@@ -27,6 +27,7 @@ namespace MostAPI.Controllers
         }
 
         [HttpPost]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> AddReview([FromForm] string name, [FromForm] string username, [FromForm] IFormFile image)
         {
             if (image == null || image.Length == 0)
