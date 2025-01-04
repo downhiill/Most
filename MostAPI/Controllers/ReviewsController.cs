@@ -2,6 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MostAPI.Data;
+using MostAPI.Service;
 
 namespace MostAPI.Controllers
 {
@@ -11,9 +12,9 @@ namespace MostAPI.Controllers
     {
         private readonly IMongoCollection<Review> _reviews;
 
-        public ReviewsController(IMongoDatabase database)
+        public ReviewsController(MongoDBService database)
         {
-            _reviews = database.GetCollection<Review>("reviews");
+            _reviews = database.Reviews;
         }
 
         // Создание отзыва
