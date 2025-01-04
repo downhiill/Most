@@ -30,11 +30,27 @@ namespace MostAPI.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AddReview([FromForm] string name, [FromForm] string username, [FromForm] IFormFile image)
         {
+            // Проверка наличия файла
             if (image == null || image.Length == 0)
             {
                 return BadRequest("Image file is required.");
             }
 
+            // Проверка на допустимый размер файла (например, 5 MB)
+            if (image.Length > 5 * 1024 * 1024)
+            {
+                return BadRequest("File size exceeds the 5 MB limit.");
+            }
+
+            // Проверка расширения файла
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            var fileExtension = Path.GetExtension(image.FileName).ToLower();
+            if (!allowedExtensions.Contains(fileExtension))
+            {
+                return BadRequest("Invalid file format. Only images are allowed.");
+            }
+
+            // Загружаем файл на Cloudinary
             var imageUrl = await _cloudinaryService.UploadImageAsync(image);
 
             var review = new Review
@@ -47,6 +63,7 @@ namespace MostAPI.Controllers
             await _reviews.InsertOneAsync(review);
             return CreatedAtAction(nameof(GetReviews), new { id = review.Id }, review);
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateReview(int id, [FromBody] Review updatedReview)
