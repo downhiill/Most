@@ -26,6 +26,8 @@ namespace MostAPI.Service
         public IMongoCollection<Category> Categories => _database.GetCollection<Category>("Categories");
         public IMongoCollection<Faq> Faqs => _database.GetCollection<Faq>("FAQ");
         public IMongoCollection<Review> Reviews => _database.GetCollection<Review>("Review");
+
+
     }
 
 }

@@ -52,6 +52,14 @@ namespace MostAPI.Controllers
             return Ok(review);
         }
 
+        // Получение всех отзывов
+        [HttpGet]
+        public async Task<ActionResult<List<Review>>> GetAllReviews()
+        {
+            var reviews = await _reviews.Find(new BsonDocument()).ToListAsync(); // Пустой фильтр для получения всех документов
+            return Ok(reviews);
+        }
+
         // Обновление отзыва
         [HttpPut("{id}")]
         [Consumes("multipart/form-data")]
