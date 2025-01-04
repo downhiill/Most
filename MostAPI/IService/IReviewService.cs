@@ -6,7 +6,7 @@ namespace MostAPI.IService
     {
         Task<List<Review>> GetReviewsAsync();
         Task CreateReviewAsync(Review review);
-        Task UpdateReviewAsync(string id, Review review);
-        Task DeleteReviewAsync(string id);
+        Task UpdateReviewAsync(int id, Review review);
+        Task DeleteReviewAsync(int id);
     }
 }
