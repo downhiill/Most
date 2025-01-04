@@ -51,10 +51,10 @@ if (!string.IsNullOrEmpty(mongoConnectionString))
     builder.Services.AddSingleton<IMongoClient, MongoClient>(sp => new MongoClient(mongoConnectionString));
 }
 builder.Services.AddScoped<MongoDBService>();
-builder.Services.AddScoped<FaqService>();
-builder.Services.AddScoped<CategoryService>();
-builder.Services.AddScoped<ServicesService>();
-builder.Services.AddScoped<CloudinaryService>();
+builder.Services.AddScoped<IFaqService, FaqService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IServiceService, ServicesService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 //Convertation To ConnectionString URL
 string ConvertPostgresqlUrlToConnectionString(string postgresqlUrl)
