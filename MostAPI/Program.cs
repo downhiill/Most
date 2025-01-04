@@ -25,7 +25,10 @@ builder.Services.AddCors(options =>
 
 // Swagger setup (if you already have one)
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.OperationFilter<FileUploadOperationFilter>();
+});
 
 // PostgreSQL
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
@@ -69,7 +72,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+    });
 }
 
 // Enable CORS for all routes

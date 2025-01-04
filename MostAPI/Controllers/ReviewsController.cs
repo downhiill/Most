@@ -50,6 +50,7 @@ namespace MostAPI.Controllers
             }
 
             [HttpPost("{id}/upload-image")]
+            [Consumes("multipart/form-data")]
             public async Task<IActionResult> UploadImage(int id, [FromForm] IFormFile file)
             {
                 var imageUrl = await _cloudinaryService.UploadImageAsync(file);
