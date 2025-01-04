@@ -27,11 +27,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Cloudinary
-var cloudinaryApiKey = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY");
-var cloudinaryApiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET");
-var cloudinaryCloudName = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME");
-
 // PostgreSQL
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
 
@@ -54,7 +49,6 @@ builder.Services.AddScoped<MongoDBService>();
 builder.Services.AddScoped<IFaqService, FaqService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IServiceService, ServicesService>();
-builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 //Convertation To ConnectionString URL
 string ConvertPostgresqlUrlToConnectionString(string postgresqlUrl)
