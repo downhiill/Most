@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
+using MongoDB.Bson;
 using MostAPI.Data;
 using MostAPI.Service;
 
@@ -26,10 +27,7 @@ namespace MostAPI.Controllers
                 return BadRequest("Both images are required for comparison.");
             }
 
-            var comparison = new ImageComparison
-            {
-                Id = Guid.NewGuid().ToString() // Устанавливаем идентификатор
-            };
+            var comparison = new ImageComparison();
 
             // Сохраняем первое изображение
             using (var memoryStream1 = new MemoryStream())
@@ -49,14 +47,19 @@ namespace MostAPI.Controllers
             await _imageComparisons.InsertOneAsync(comparison);
 
             // Возвращаем ответ с ссылкой на созданный ресурс
-            return CreatedAtAction(nameof(GetComparison), new { id = comparison.Id }, comparison);
+            return CreatedAtAction(nameof(GetComparison), new { id = comparison.Id.ToString() }, comparison);
         }
 
         // Получение сравнения по ID
         [HttpGet("{id}")]
         public async Task<ActionResult<ImageComparison>> GetComparison(string id)
         {
-            var comparison = await _imageComparisons.Find(c => c.Id == id).FirstOrDefaultAsync();
+            if (!ObjectId.TryParse(id, out var objectId))
+            {
+                return BadRequest("Invalid ID format.");
+            }
+
+            var comparison = await _imageComparisons.Find(c => c.Id == objectId).FirstOrDefaultAsync();
             if (comparison == null)
                 return NotFound();
 
@@ -75,7 +78,12 @@ namespace MostAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteComparison(string id)
         {
-            var result = await _imageComparisons.DeleteOneAsync(c => c.Id == id);
+            if (!ObjectId.TryParse(id, out var objectId))
+            {
+                return BadRequest("Invalid ID format.");
+            }
+
+            var result = await _imageComparisons.DeleteOneAsync(c => c.Id == objectId);
             if (result.DeletedCount == 0)
                 return NotFound();
 
