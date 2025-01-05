@@ -26,7 +26,10 @@ namespace MostAPI.Controllers
                 return BadRequest("Both images are required for comparison.");
             }
 
-            var comparison = new ImageComparison();
+            var comparison = new ImageComparison
+            {
+                Id = Guid.NewGuid().ToString() // Устанавливаем идентификатор
+            };
 
             // Сохраняем первое изображение
             using (var memoryStream1 = new MemoryStream())
@@ -44,6 +47,8 @@ namespace MostAPI.Controllers
 
             // Сохраняем сравнение в базу данных
             await _imageComparisons.InsertOneAsync(comparison);
+
+            // Возвращаем ответ с ссылкой на созданный ресурс
             return CreatedAtAction(nameof(GetComparison), new { id = comparison.Id }, comparison);
         }
 
