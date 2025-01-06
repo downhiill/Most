@@ -1,9 +1,11 @@
-﻿using MostAPI.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using MostAPI.Data;
 
 namespace MostAPI.IService
 {
     public interface IFaqService
     {
+        Task<List<Faq>> GetAllAsync();
         Task<List<Faq>> GetRandomAsync(int count = 5);
         Task<Faq> GetByIdAsync(int id);
         Task CreateAsync(Faq faq);

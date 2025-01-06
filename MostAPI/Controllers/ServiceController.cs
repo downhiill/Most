@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MostAPI.Data;
+using MostAPI.IService;
 using MostAPI.Service;
 
 namespace MostAPI.Controllers
@@ -8,9 +9,9 @@ namespace MostAPI.Controllers
     [ApiController]
     public class ServiceController : Controller
     {
-        private readonly ServicesService _servicesService;
+        private readonly IServiceService _servicesService;
 
-        public ServiceController(ServicesService servicesService)
+        public ServiceController(IServiceService servicesService)
         {
             _servicesService = servicesService;
         }

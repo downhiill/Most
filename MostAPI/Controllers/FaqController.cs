@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MostAPI.Data;
+using MostAPI.IService;
 using MostAPI.Service;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,9 +11,9 @@ namespace MostAPI.Controllers
     [ApiController]
     public class FaqController : ControllerBase
     {
-        private readonly FaqService _faqService;
+        private readonly IFaqService _faqService;
 
-        public FaqController(FaqService faqService)
+        public FaqController(IFaqService faqService)
         {
             _faqService = faqService;
         }
