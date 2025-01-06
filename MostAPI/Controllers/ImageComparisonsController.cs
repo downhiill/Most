@@ -3,6 +3,8 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using MostAPI.Data;
 using MostAPI.Service;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MostAPI.Controllers
 {
@@ -18,16 +20,19 @@ namespace MostAPI.Controllers
         }
 
         // Создание сравнения
-        [HttpPost]
+        [HttpPost("{pageId}")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CreateImageComparison([FromForm] ImageComparisonRequest request)
+        public async Task<IActionResult> CreateImageComparison(int pageId, [FromForm] ImageComparisonRequest request)
         {
             if (request.Image1 == null || request.Image2 == null)
             {
                 return BadRequest("Both images are required for comparison.");
             }
 
-            var comparison = new ImageComparison();
+            var comparison = new ImageComparison
+            {
+                PageId = pageId
+            };
 
             // Сохраняем первое изображение
             using (var memoryStream1 = new MemoryStream())
@@ -46,7 +51,6 @@ namespace MostAPI.Controllers
             // Сохраняем сравнение в базу данных
             await _imageComparisons.InsertOneAsync(comparison);
 
-            // Возвращаем ответ с ссылкой на созданный ресурс
             return CreatedAtAction(nameof(GetComparison), new { id = comparison.Id.ToString() }, comparison);
         }
 
@@ -61,17 +65,29 @@ namespace MostAPI.Controllers
 
             var comparison = await _imageComparisons.Find(c => c.Id == objectId).FirstOrDefaultAsync();
             if (comparison == null)
-                return NotFound();
+                return NotFound("Comparison not found.");
 
             return Ok(comparison);
         }
 
-        // Получение всех сравнений
+        // Получение всех сравнений для страницы
         [HttpGet]
-        public async Task<ActionResult<List<ImageComparison>>> GetAllComparisons()
+        public async Task<IActionResult> GetComparisons([FromQuery] int pageId)
         {
-            var comparisons = await _imageComparisons.Find(Builders<ImageComparison>.Filter.Empty).ToListAsync();
-            return Ok(comparisons);
+            var comparisons = await _imageComparisons.Find(c => c.PageId == pageId).ToListAsync();
+
+            if (!comparisons.Any())
+                return NotFound("No comparisons found for the given page.");
+
+            // Разделяем изображения на "до" и "после"
+            var beforeImages = comparisons.Select(c => Convert.ToBase64String(c.Image1)).ToList();
+            var afterImages = comparisons.Select(c => Convert.ToBase64String(c.Image2)).ToList();
+
+            return Ok(new
+            {
+                BeforeImages = beforeImages,
+                AfterImages = afterImages
+            });
         }
 
         // Редактирование существующего сравнения
@@ -119,7 +135,6 @@ namespace MostAPI.Controllers
             return NoContent(); // Успешное обновление
         }
 
-
         // Удаление сравнения
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteComparison(string id)
@@ -131,7 +146,7 @@ namespace MostAPI.Controllers
 
             var result = await _imageComparisons.DeleteOneAsync(c => c.Id == objectId);
             if (result.DeletedCount == 0)
-                return NotFound();
+                return NotFound("Comparison not found.");
 
             return NoContent();
         }
