@@ -74,6 +74,52 @@ namespace MostAPI.Controllers
             return Ok(comparisons);
         }
 
+        // Редактирование существующего сравнения
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateComparison(string id, [FromForm] ImageComparisonRequest request)
+        {
+            if (!ObjectId.TryParse(id, out var objectId))
+            {
+                return BadRequest("Invalid ID format.");
+            }
+
+            var existingComparison = await _imageComparisons.Find(c => c.Id == objectId).FirstOrDefaultAsync();
+            if (existingComparison == null)
+            {
+                return NotFound("Comparison not found.");
+            }
+
+            // Обновляем изображения, если они предоставлены
+            if (request.Image1 != null)
+            {
+                using (var memoryStream1 = new MemoryStream())
+                {
+                    await request.Image1.CopyToAsync(memoryStream1);
+                    existingComparison.Image1 = memoryStream1.ToArray();
+                }
+            }
+
+            if (request.Image2 != null)
+            {
+                using (var memoryStream2 = new MemoryStream())
+                {
+                    await request.Image2.CopyToAsync(memoryStream2);
+                    existingComparison.Image2 = memoryStream2.ToArray();
+                }
+            }
+
+            // Обновляем запись в базе данных
+            var updateResult = await _imageComparisons.ReplaceOneAsync(c => c.Id == objectId, existingComparison);
+
+            if (updateResult.ModifiedCount == 0)
+            {
+                return StatusCode(500, "Unable to update the comparison.");
+            }
+
+            return NoContent(); // Успешное обновление
+        }
+
+
         // Удаление сравнения
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteComparison(string id)
