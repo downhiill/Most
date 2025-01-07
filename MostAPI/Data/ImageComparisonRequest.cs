@@ -4,7 +4,7 @@ namespace MostAPI.Data
 {
     public class ImageComparisonRequest
     {
-        [Required(ErrorMessage = "Первое изображение обязательно.")]
+        [Required(ErrorMessage = "Первое изображение обязательно")]
         [FileExtensions(Extensions = "jpg,jpeg,png,JPG,JPEG,PNG", ErrorMessage = "Разрешены только изображения форматов JPG и PNG.")]
         [MaxFileSize(5 * 1024 * 1024, ErrorMessage = "Размер файла не должен превышать 5 МБ.")]
         public IFormFile Image1 { get; set; } // Первое изображение
