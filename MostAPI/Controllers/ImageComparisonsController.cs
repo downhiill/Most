@@ -38,7 +38,7 @@ namespace MostAPI.Controllers
                     Image1 = await GetBytesAsync(request.Image1),
                     Image2 = await GetBytesAsync(request.Image2)
                 };
-
+                Console.WriteLine($"Image1 Length: {comparison.Image1.Length}, Image2 Length: {comparison.Image2.Length}");
                 await _imageComparisons.InsertOneAsync(comparison);
 
                 return CreatedAtAction(nameof(GetComparison), new { id = comparison.Id.ToString() }, comparison);
