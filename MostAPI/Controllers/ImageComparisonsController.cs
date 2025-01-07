@@ -76,10 +76,13 @@ namespace MostAPI.Controllers
                 if (!comparisons.Any())
                     return NotFound("Сравнения не найдены для указанной страницы.");
 
+                var beforeImages = comparisons.Select(c => Convert.ToBase64String(c.Image1)).ToList();
+                var afterImages = comparisons.Select(c => Convert.ToBase64String(c.Image2)).ToList();
+
                 return Ok(new
                 {
-                    BeforeImages = comparisons.Select(c => Convert.ToBase64String(c.Image1)).ToList(),
-                    AfterImages = comparisons.Select(c => Convert.ToBase64String(c.Image2)).ToList()
+                    BeforeImages = beforeImages,
+                    AfterImages = afterImages
                 });
             }
             catch (Exception ex)
@@ -87,6 +90,7 @@ namespace MostAPI.Controllers
                 return StatusCode(500, $"Ошибка сервера: {ex.Message}");
             }
         }
+
 
         // Редактирование существующего сравнения
         [HttpPut("{id}")]
