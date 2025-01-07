@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MostAPI.Data;
 using MostAPI.Service;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MostAPI.Controllers
@@ -24,34 +25,28 @@ namespace MostAPI.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> CreateImageComparison(int pageId, [FromForm] ImageComparisonRequest request)
         {
-            if (request.Image1 == null || request.Image2 == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Both images are required for comparison.");
+                return BadRequest(ModelState);
             }
 
-            var comparison = new ImageComparison
+            try
             {
-                PageId = pageId
-            };
+                var comparison = new ImageComparison
+                {
+                    PageId = pageId,
+                    Image1 = await GetBytesAsync(request.Image1),
+                    Image2 = await GetBytesAsync(request.Image2)
+                };
 
-            // Сохраняем первое изображение
-            using (var memoryStream1 = new MemoryStream())
-            {
-                await request.Image1.CopyToAsync(memoryStream1);
-                comparison.Image1 = memoryStream1.ToArray();
+                await _imageComparisons.InsertOneAsync(comparison);
+
+                return CreatedAtAction(nameof(GetComparison), new { id = comparison.Id.ToString() }, comparison);
             }
-
-            // Сохраняем второе изображение
-            using (var memoryStream2 = new MemoryStream())
+            catch (Exception ex)
             {
-                await request.Image2.CopyToAsync(memoryStream2);
-                comparison.Image2 = memoryStream2.ToArray();
+                return StatusCode(500, $"Ошибка сервера: {ex.Message}");
             }
-
-            // Сохраняем сравнение в базу данных
-            await _imageComparisons.InsertOneAsync(comparison);
-
-            return CreatedAtAction(nameof(GetComparison), new { id = comparison.Id.ToString() }, comparison);
         }
 
         // Получение сравнения по ID
@@ -60,12 +55,12 @@ namespace MostAPI.Controllers
         {
             if (!ObjectId.TryParse(id, out var objectId))
             {
-                return BadRequest("Invalid ID format.");
+                return BadRequest("Некорректный формат ID.");
             }
 
             var comparison = await _imageComparisons.Find(c => c.Id == objectId).FirstOrDefaultAsync();
             if (comparison == null)
-                return NotFound("Comparison not found.");
+                return NotFound("Сравнение не найдено.");
 
             return Ok(comparison);
         }
@@ -74,20 +69,23 @@ namespace MostAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetComparisons([FromQuery] int pageId)
         {
-            var comparisons = await _imageComparisons.Find(c => c.PageId == pageId).ToListAsync();
-
-            if (!comparisons.Any())
-                return NotFound("No comparisons found for the given page.");
-
-            // Разделяем изображения на "до" и "после"
-            var beforeImages = comparisons.Select(c => Convert.ToBase64String(c.Image1)).ToList();
-            var afterImages = comparisons.Select(c => Convert.ToBase64String(c.Image2)).ToList();
-
-            return Ok(new
+            try
             {
-                BeforeImages = beforeImages,
-                AfterImages = afterImages
-            });
+                var comparisons = await _imageComparisons.Find(c => c.PageId == pageId).ToListAsync();
+
+                if (!comparisons.Any())
+                    return NotFound("Сравнения не найдены для указанной страницы.");
+
+                return Ok(new
+                {
+                    BeforeImages = comparisons.Select(c => Convert.ToBase64String(c.Image1)).ToList(),
+                    AfterImages = comparisons.Select(c => Convert.ToBase64String(c.Image2)).ToList()
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ошибка сервера: {ex.Message}");
+            }
         }
 
         // Редактирование существующего сравнения
@@ -96,43 +94,40 @@ namespace MostAPI.Controllers
         {
             if (!ObjectId.TryParse(id, out var objectId))
             {
-                return BadRequest("Invalid ID format.");
+                return BadRequest("Некорректный формат ID.");
             }
 
             var existingComparison = await _imageComparisons.Find(c => c.Id == objectId).FirstOrDefaultAsync();
             if (existingComparison == null)
             {
-                return NotFound("Comparison not found.");
+                return NotFound("Сравнение не найдено.");
             }
 
-            // Обновляем изображения, если они предоставлены
-            if (request.Image1 != null)
+            try
             {
-                using (var memoryStream1 = new MemoryStream())
+                if (request.Image1 != null)
                 {
-                    await request.Image1.CopyToAsync(memoryStream1);
-                    existingComparison.Image1 = memoryStream1.ToArray();
+                    existingComparison.Image1 = await GetBytesAsync(request.Image1);
                 }
-            }
 
-            if (request.Image2 != null)
-            {
-                using (var memoryStream2 = new MemoryStream())
+                if (request.Image2 != null)
                 {
-                    await request.Image2.CopyToAsync(memoryStream2);
-                    existingComparison.Image2 = memoryStream2.ToArray();
+                    existingComparison.Image2 = await GetBytesAsync(request.Image2);
                 }
+
+                var updateResult = await _imageComparisons.ReplaceOneAsync(c => c.Id == objectId, existingComparison);
+
+                if (updateResult.ModifiedCount == 0)
+                {
+                    return StatusCode(500, "Не удалось обновить сравнение.");
+                }
+
+                return NoContent();
             }
-
-            // Обновляем запись в базе данных
-            var updateResult = await _imageComparisons.ReplaceOneAsync(c => c.Id == objectId, existingComparison);
-
-            if (updateResult.ModifiedCount == 0)
+            catch (Exception ex)
             {
-                return StatusCode(500, "Unable to update the comparison.");
+                return StatusCode(500, $"Ошибка сервера: {ex.Message}");
             }
-
-            return NoContent(); // Успешное обновление
         }
 
         // Удаление сравнения
@@ -141,14 +136,29 @@ namespace MostAPI.Controllers
         {
             if (!ObjectId.TryParse(id, out var objectId))
             {
-                return BadRequest("Invalid ID format.");
+                return BadRequest("Некорректный формат ID.");
             }
 
-            var result = await _imageComparisons.DeleteOneAsync(c => c.Id == objectId);
-            if (result.DeletedCount == 0)
-                return NotFound("Comparison not found.");
+            try
+            {
+                var result = await _imageComparisons.DeleteOneAsync(c => c.Id == objectId);
+                if (result.DeletedCount == 0)
+                    return NotFound("Сравнение не найдено.");
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ошибка сервера: {ex.Message}");
+            }
+        }
+
+        // Метод для получения массива байтов из IFormFile
+        private static async Task<byte[]> GetBytesAsync(IFormFile file)
+        {
+            using var memoryStream = new MemoryStream();
+            await file.CopyToAsync(memoryStream);
+            return memoryStream.ToArray();
         }
     }
 }
