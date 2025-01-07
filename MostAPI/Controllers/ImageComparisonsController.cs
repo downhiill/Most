@@ -76,20 +76,26 @@ namespace MostAPI.Controllers
                 if (!comparisons.Any())
                     return NotFound("Сравнения не найдены для указанной страницы.");
 
+                // Преобразование изображений в строки Base64
                 var beforeImages = comparisons.Select(c => Convert.ToBase64String(c.Image1)).ToList();
                 var afterImages = comparisons.Select(c => Convert.ToBase64String(c.Image2)).ToList();
 
-                return Ok(new
+                // Создаем ответ с двумя отдельными массивами изображений
+                var response = new
                 {
-                    BeforeImages = beforeImages,
-                    AfterImages = afterImages
-                });
+                    BeforeImages = beforeImages.ToArray(),  // Массив строк для изображений до
+                    AfterImages = afterImages.ToArray()     // Массив строк для изображений после
+                };
+
+                // Возвращаем правильную структуру данных
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Ошибка сервера: {ex.Message}");
             }
         }
+
 
 
         // Редактирование существующего сравнения
