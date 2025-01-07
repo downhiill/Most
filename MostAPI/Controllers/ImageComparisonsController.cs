@@ -38,7 +38,7 @@ namespace MostAPI.Controllers
                     Image1 = await GetBytesAsync(request.Image1),
                     Image2 = await GetBytesAsync(request.Image2)
                 };
-                Console.WriteLine($"Image1 Length: {comparison.Image1.Length}, Image2 Length: {comparison.Image2.Length}");
+
                 await _imageComparisons.InsertOneAsync(comparison);
 
                 return CreatedAtAction(nameof(GetComparison), new { id = comparison.Id.ToString() }, comparison);
@@ -76,18 +76,14 @@ namespace MostAPI.Controllers
                 if (!comparisons.Any())
                     return NotFound("Сравнения не найдены для указанной страницы.");
 
-                // Преобразование изображений в строки Base64
-                var beforeImages = comparisons.Select(c => Convert.ToBase64String(c.Image1)).ToList();
-                var afterImages = comparisons.Select(c => Convert.ToBase64String(c.Image2)).ToList();
-
-                // Создаем ответ с двумя отдельными массивами изображений
-                var response = new
+                // Преобразование изображений и добавление Id
+                var response = comparisons.Select(c => new
                 {
-                    BeforeImages = beforeImages.ToArray(),  // Массив строк для изображений до
-                    AfterImages = afterImages.ToArray()     // Массив строк для изображений после
-                };
+                    Id = c.Id.ToString(),
+                    BeforeImage = Convert.ToBase64String(c.Image1),
+                    AfterImage = Convert.ToBase64String(c.Image2)
+                }).ToList();
 
-                // Возвращаем правильную структуру данных
                 return Ok(response);
             }
             catch (Exception ex)
