@@ -111,17 +111,29 @@ namespace MostAPI.Controllers
 
             try
             {
+                // Обновляем только переданные изображения
+                var updateDefinitionBuilder = Builders<ImageComparison>.Update;
+                var updates = new List<UpdateDefinition<ImageComparison>>();
+
                 if (request.Image1 != null)
                 {
-                    existingComparison.Image1 = await GetBytesAsync(request.Image1);
+                    var image1Bytes = await GetBytesAsync(request.Image1);
+                    updates.Add(updateDefinitionBuilder.Set(c => c.Image1, image1Bytes));
                 }
 
                 if (request.Image2 != null)
                 {
-                    existingComparison.Image2 = await GetBytesAsync(request.Image2);
+                    var image2Bytes = await GetBytesAsync(request.Image2);
+                    updates.Add(updateDefinitionBuilder.Set(c => c.Image2, image2Bytes));
                 }
 
-                var updateResult = await _imageComparisons.ReplaceOneAsync(c => c.Id == objectId, existingComparison);
+                if (!updates.Any())
+                {
+                    return BadRequest("Нет данных для обновления.");
+                }
+
+                var updateDefinition = updateDefinitionBuilder.Combine(updates);
+                var updateResult = await _imageComparisons.UpdateOneAsync(c => c.Id == objectId, updateDefinition);
 
                 if (updateResult.ModifiedCount == 0)
                 {
