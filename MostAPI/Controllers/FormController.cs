@@ -15,14 +15,20 @@ namespace MostAPI.Controllers
     {
         private static readonly string TelegramBotToken = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN");
 
+
         private readonly TelegramBotClient _botClient;
         private readonly PostgresDbContext _context;
 
         public FormController(PostgresDbContext context)
         {
             _context = context;
+
+            // Логируем токен для проверки
+            Console.WriteLine($"TelegramBotToken: {TelegramBotToken}");
+
             _botClient = new TelegramBotClient(TelegramBotToken);
         }
+
 
         // POST api/values
         [HttpPost]
@@ -58,8 +64,7 @@ namespace MostAPI.Controllers
             {
                 return StatusCode(500, $"Error sending message: {ex.Message}");
             }
+
         }
-
-
     }
 }
