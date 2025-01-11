@@ -23,9 +23,6 @@ namespace MostAPI.Controllers
         {
             _context = context;
 
-            // Логируем токен для проверки
-            Console.WriteLine($"TelegramBotToken: {TelegramBotToken}");
-
             _botClient = new TelegramBotClient(TelegramBotToken);
         }
 
