@@ -41,7 +41,7 @@ namespace MostAPI.Controllers
             try
             {
                 // Получаем список администраторов из базы данных
-                var adminChatIds = await _context.admins
+                var adminChatIds = await _context.Admins
                     .Select(a => a.ChatId)
                     .ToListAsync();
 

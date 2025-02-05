@@ -6,7 +6,8 @@ namespace MostAPI.Context
 {
     public class PostgresDbContext : DbContext
     {
-        public DbSet<Admin> admins { get; set; }
+        public DbSet<Admin> Admins { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
