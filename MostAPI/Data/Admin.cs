@@ -3,7 +3,7 @@
     public class Admin
     {
         public int Id { get; set; }
-        public string ChatId { get; set; } // ID чата
+        public long ChatId { get; set; } // ID чата
     }
 
 }
